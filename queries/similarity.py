@@ -14,6 +14,7 @@ import random
 
 from xdfile.utils import progress, get_args, find_files, open_output, COLUMN_SEPARATOR, EOL, debug
 from xdfile import xdfile, corpus, clues
+from xdfile.similarity import grid_similarity
 
 
 g_boiled_clues = { }  # ["boiled clue"] = list(ClueAnswer(dt, pubid, clue, answer))
@@ -33,30 +34,6 @@ def fast_grid_similarity(a, b):
                 r += 1
 
     return r
-
-
-def grid_similarity(a, b):
-    if len(a.grid) != len(b.grid) or len(a.grid[0]) != len(b.grid[0]):
-        return 0
-
-    r = 0
-    tot = 0
-    for row1, row2 in zip(a.grid, b.grid):
-        for i in range(len(row1)):
-            if row1[i] != '#':
-                tot += 1
-                if row1[i] == row2[i]:
-                    r += 1
-
-    astr = a.to_unicode()
-    bstr = b.to_unicode()
-    if astr == bstr:
-        return 100
-
-    # add in a little bit of just whole string comparison to catch grid dissimilarities
-    #total_diffs = sum(map(str.__eq__, astr, bstr)) / float(max(len(astr), len(bstr)))
-
-    return int(r * 100 / float(tot))
 
 
 def find_similar_to(needle, haystack, min_pct=0.3):
@@ -126,7 +103,7 @@ def load_answers():
             if ca.answer not in g_answers:
                 ans = dict()
                 g_answers[ca.answer] = ans
-            else: 
+            else:
                 ans = g_answers[ca.answer]
 
             bc = boil(ca.clue)
@@ -154,7 +131,7 @@ def find_answers_for_clue(clue):
         return [ ]
 
     return set(ca.answer for ca in g_boiled_clues.get(bc, []))
-    
+
 
 xd_similar_header = COLUMN_SEPARATOR.join(["needle", "match", "percent"]) + EOL
 

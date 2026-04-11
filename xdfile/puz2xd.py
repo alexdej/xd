@@ -67,7 +67,10 @@ def parse_puz(contents, filename):
     xd.set_header("Author", puzobj.author)
     xd.set_header("Copyright", puzobj.copyright)
     xd.set_header("Notes", puzobj.notes)
-    xd.set_header("Postscript", "".join(x for x in puzobj.postscript if ord(x) >= ord(' ')))
+    postscript = puzobj.postscript or ""
+    if isinstance(postscript, (bytes, bytearray)):
+        postscript = postscript.decode("cp1252", errors="ignore")
+    xd.set_header("Postscript", "".join(x for x in postscript if ord(x) >= ord(' ')))
     xd.set_header("Preamble", puzobj.preamble)
 
     xd.set_header("Title", puzobj.title)
@@ -92,7 +95,7 @@ def parse_puz(contents, filename):
 
     # check for circles and record them if they exist
     circles = []
-    if b"GEXT" in puzobj.extensions: 
+    if b"GEXT" in puzobj.extensions:
         for i, c in enumerate(puzobj.extensions[b"GEXT"]):
             if c == 0x80: circles.append(i)
     if circles: xd.set_header("Special", "circle")
