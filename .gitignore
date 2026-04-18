@@ -5,6 +5,7 @@
 .cache/
 xd*egg*
 *.zip*
+build/
 wwwroot/
 gxd/
 pub/
